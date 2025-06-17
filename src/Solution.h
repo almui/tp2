@@ -4,20 +4,22 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include "VRPLIBReader.h"
 
 using namespace std;
 
 class Solution {
 public:
-    Solution(const string& filePath);
+    Solution(const VRPLIBReader& instancia);
     void addRuta(int id);
     void addClient(int id, int ruta, int atras, int adelante);
     void removeClient(int id, int ruta,int atras, int adelante);
     bool esValida(int ruta);
-    vector<int> getRutas();
+    vector<vector<int>> getRutas();
     vector<int> getDistancias();
-    vector<int> getInstancia();
+    VRPLIBReader getInstancia();
+    void printSolution() const;
   
 //id deposito = 1
 

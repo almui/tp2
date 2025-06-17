@@ -1,18 +1,18 @@
 #include "Solution.h"
 
-Solution::Solution(const string& filePath) {
-    _instancia= VRPLIBReader(filePath);
-    _sol=vector<int>(_instancia.getDimension());
+Solution::Solution(const VRPLIBReader& instancia) : _instancia(instancia)  {
+    _sol = vector<vector<int>>(instancia.getDimension());
     _rutas={};
     _sumd={};
     _distancias={};
 }
 
 void Solution::addRuta(int id){
-    _rutas.push_back({id});
+    _rutas.push_back({ id});
     _sol[0].push_back(id);
     _sol[id].push_back(0);
-    _sumd.push_back(_instancia.getDemands()[id]);
+    vector<int> demandas=_instancia.getDemands();
+    _sumd.push_back(demandas[id]);
     _distancias.push_back(_instancia.getDistanceMatrix()[0][id] + _instancia.getDistanceMatrix()[id][0]);
 }
 bool Solution::contain(int id, vector<int> ruta){
@@ -53,19 +53,52 @@ void Solution::removeClient(int id, int ruta,int atras, int adelante){
     _distancias[ruta]-=_instancia.getDistanceMatrix()[atras][id] + _instancia.getDistanceMatrix()[id][adelante];
 }
 bool Solution::esValida(int ruta){
-    if(_sumd[ruta]<=_intancia.getCapacity()){
+    if(_sumd[ruta]<=_instancia.getCapacity()){
         return true;
     } else{
         return false;
 
     }
 }
-vector<int> Solution::getRutas(){
-    return _rutas
+vector<vector<int>> Solution::getRutas(){
+    return _rutas;
 }
 vector<int> Solution::getDistancias(){
     return _distancias;
 }
-vector<int> Solution::getInstancia(){
+VRPLIBReader Solution::getInstancia(){
     return _instancia;
 }
+void Solution::printSolution() const{
+    string nombre = _instancia.getName();
+    int depot = _instancia.getDepotId();
+
+    double totalCost = 0.0;
+    for (int ruta=0; ruta < _distancias.size(); ruta++) {
+        totalCost += _distancias[ruta];
+    }
+    cout << "NAME    : " << nombre << endl;
+    cout << "ROUTES  : " << _rutas.size() << endl;
+    cout << "COST    : " << totalCost << endl;
+    cout << "SOLUTION_SECTION" << endl;
+    cout << " #R   SUMD        COST     LENGTH   #C     SEQUENCE" << endl;
+
+    for (int i = 0; i < _rutas.size(); ++i) {
+
+        cout << setw(3) << i + 1 << "  "
+             << setw(5) << _sumd[i] << "  "
+             << setw(10) << _distancias[i] << "  "
+             << setw(10) << _distancias[i] << "  "
+             << setw(4) << _rutas[i].size() << "     ";
+
+        for (int j = 0; j <_rutas[i].size(); ++j) {
+            cout << _rutas[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "DEPOT_SECTION" << endl;
+    cout << depot << endl;
+    cout << "END" << endl;
+}
+

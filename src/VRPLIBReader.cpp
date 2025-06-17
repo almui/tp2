@@ -105,7 +105,7 @@ void VRPLIBReader::computeDistanceMatrix() {
 }
 
 
-+ Implementations ---
+//+ Implementations ---
 
 const std::string& VRPLIBReader::getName() const { return name; }
 int VRPLIBReader::getDimension() const { return dimension; }
