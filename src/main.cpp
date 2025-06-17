@@ -1,5 +1,7 @@
 #include <iostream>
 #include "VRPLIBReader.h"
+#include "ClarkeWrightConRelocate.h"
+
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -31,7 +33,18 @@ int main(int argc, char* argv[]) {
         std::cout << std::endl;
     }
 
-    
+    std::cout << "\nEjecutando Clarke & Wright con mejora relocate...\n" << std::endl;
+    std::vector<std::vector<int>> rutas = clarke_wright(reader);
+
+    std::cout << "Rutas generadas:\n";
+    for (size_t i = 0; i < rutas.size(); ++i) {
+        std::cout << "Ruta " << i + 1 << ": ";
+        for (int cliente : rutas[i]) {
+            std::cout << cliente << " ";
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
+

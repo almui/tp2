@@ -19,7 +19,7 @@ public:
     vector<int> getDistancias();
     vector<int> getInstancia();
   
-
+//id deposito = 1
 
 private:
     vector<vector<int>> _sol; //grafo dirigido cada posicion es un nodo, y el vector en esa posicion son los nodos a los que apunta
