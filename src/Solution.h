@@ -1,0 +1,36 @@
+#ifndef SOLUTION
+#define SOLUTION
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include "VRPLIBReader.h"
+
+using namespace std;
+
+class Solution {
+public:
+    Solution(const string& filePath);
+    void addRuta(int id);
+    void addClient(int id, int ruta, int atras, int adelante);
+    void removeClient(int id, int ruta,int atras, int adelante);
+    bool esValida(int ruta);
+    vector<int> getRutas();
+    vector<int> getDistancias();
+    vector<int> getInstancia();
+  
+
+
+private:
+    vector<vector<int>> _sol; //grafo dirigido cada posicion es un nodo, y el vector en esa posicion son los nodos a los que apunta
+    vector<vector<int>> _rutas;// las rutas ordenadas. Ejemplo: {2,8,4};{3,5,6};{1,7}
+    vector<int> _sumd;
+    vector<int> _distancias;
+    VRPLIBReader _instancia;
+
+    bool contain(int id, vector<int> ruta);
+    int posicion(int id, vector<int> v);
+};
+
+
+#endif // SOLUTION 
