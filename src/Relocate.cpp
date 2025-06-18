@@ -7,57 +7,58 @@ using namespace std;
 
 
 
+// Realiza una búsqueda local tipo "relocate" para mejorar el costo total de las rutas
 void relocate(vector<vector<int>>& rutas, const VRPLIBReader& instancia) {
-    const vector<int>& demandas = instancia.getDemands();               // Vector con la demanda de cada cliente
-    const vector<vector<double>>& matriz_distancias = instancia.getDistanceMatrix();  // Matriz de distancias
-    int capacidad = instancia.getCapacity();                            // Capacidad del vehículo
+    const vector<int>& demandas = instancia.getDemands(); // Demanda por cliente
+    const vector<vector<double>>& matriz_distancias = instancia.getDistanceMatrix(); // Matriz de distancias
+    int capacidad = instancia.getCapacity(); // Capacidad máxima del vehículo
 
-    bool hay_mejora = true;           // Solo se pone a true si hay una mejora real
+    bool hay_mejora = true; // Para controlar si hubo mejora
 
-    // Se repite mientras se sigan encontrando mejoras
+    // Repetimos hasta que ya no se encuentren mejoras posibles
     while (hay_mejora) {
         hay_mejora = false;
 
-        // Variables para almacenar la mejor solución encontrada
+        // Guardamos el costo y rutas actuales como mejores por ahora
         double mejor_costo = calcularCostoTotal(rutas, matriz_distancias);
         vector<vector<int>> mejor_rutas = rutas;
 
-        // Recorre cada par de rutas diferentes (r1 y r2)
+        // Recorremos todos los pares de rutas distintas
         for (int r1 = 0; r1 < rutas.size(); ++r1) {
             for (int r2 = 0; r2 < rutas.size(); ++r2) {
-                if (r1 == r2) continue;  // No se permite mover dentro de la misma ruta
+                if (r1 == r2) continue; // No se permite mover dentro de la misma ruta
 
-                // Recorre los clientes de la ruta r1 (excluyendo el depósito)
+                // Recorremos todos los clientes de r1 (menos depósito en extremos)
                 for (int i = 1; i < rutas[r1].size() - 1; ++i) {
                     int cliente = rutas[r1][i];
                     int demanda_cliente = demandas[cliente];
 
-                    // Suma la demanda total actual de la ruta r2
+                    // Calculamos la demanda actual de r2
                     int demanda_total_r2 = 0;
                     for (int k = 1; k < rutas[r2].size() - 1; ++k) {
                         demanda_total_r2 += demandas[rutas[r2][k]];
                     }
 
-                    // Verifica si mover el cliente no excede la capacidad del vehículo
+                    // Verificamos que mover el cliente no exceda la capacidad
                     if (demanda_total_r2 + demanda_cliente > capacidad) continue;
 
-                    // Intenta insertar el cliente en todas las posiciones válidas de r2
+                    // Probamos insertar el cliente en todas las posiciones posibles de r2
                     for (int j = 1; j < rutas[r2].size(); ++j) {
-                        // Copia temporal de las rutas para probar el cambio
+                        // Hacemos una copia para no modificar las originales
                         vector<vector<int>> copia_rutas = rutas;
                         vector<int>& nueva_r1 = copia_rutas[r1];
                         vector<int>& nueva_r2 = copia_rutas[r2];
 
-                        // Elimina el cliente de la ruta original
+                        // Quitamos el cliente de r1
                         nueva_r1.erase(nueva_r1.begin() + i);
 
-                        // Inserta el cliente en la nueva posición de la otra ruta
+                        // Insertamos el cliente en la posición j de r2
                         nueva_r2.insert(nueva_r2.begin() + j, cliente);
 
-                        // Calcula el nuevo costo total
+                        // Calculamos el nuevo costo con este cambio
                         double nuevo_costo = calcularCostoTotal(copia_rutas, matriz_distancias);
 
-                        // Si el nuevo costo mejora el anterior, guardamos esta configuración
+                        // Si es mejor, lo guardamos como la nueva mejor solución
                         if (nuevo_costo < mejor_costo) {
                             mejor_costo = nuevo_costo;
                             mejor_rutas = copia_rutas;
@@ -68,11 +69,9 @@ void relocate(vector<vector<int>>& rutas, const VRPLIBReader& instancia) {
             }
         }
 
-        // Si se encontró una mejora, se actualiza la solución actual
+        // Si encontramos una mejora, actualizamos las rutas
         if (hay_mejora) {
             rutas = mejor_rutas;
         }
     }
 }
-
-

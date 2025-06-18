@@ -14,8 +14,7 @@ struct Ahorro {
 // Ordena los ahorros de mayor a menor
 void ordenar_ahorros(vector<Ahorro>& ahorros);
 
-// Algoritmo  de Clarke & Wright con relocate
-vector<vector<int>> clarke_wright(const VRPLIBReader& instancia);
-
+// Algoritmo  de Clarke & Wright
+Solution clarke_wright(const VRPLIBReader& instancia) 
 
 #endif 

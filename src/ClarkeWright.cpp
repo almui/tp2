@@ -1,4 +1,5 @@
 #include "ClarkeWright.h"
+#include "Solution.h"
 #include "VRPLIBReader.h"
 #include <iostream>
 #include <vector>
@@ -21,7 +22,10 @@ void ordenar_ahorros(vector<Ahorro>& ahorros) {
 
 
 // Clarke & Wright + llamada a relocate al final
-vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
+Solution clarke_wright(const VRPLIBReader& instancia) {
+    VRPLIBReader instancia(filePath);
+    Solution sol(filePath);
+    
     // Obtener el ID del depósito de la instancia (normalmente nodo 0 o similar)
     int deposito = instancia.getDepotId();
     // Obtener la cantidad total de nodos (incluyendo depósito y clientes)
@@ -40,7 +44,7 @@ vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
     vector<int> demanda_ruta(dimension + 1, 0);
 
     // Crear rutas iniciales triviales: cada cliente tiene su propia ruta [deposito, cliente, deposito]
-    for (int i = 1; i <= dimension; ++i) {
+    for (int i = 1; i < dimension; ++i) {
         if (i == deposito) continue; // No tener en cuenta el depósito 
         rutas[i] = {deposito, i, deposito}; // Ruta con un solo cliente
         demanda_ruta[i] = demandas[i];      // Demanda correspondiente al cliente
@@ -50,8 +54,8 @@ vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
     vector<Ahorro> ahorros;
 
     // Calcular los ahorros para todas los pares de clientes (i, j)
-    for (int i = 1; i <= dimension; ++i) {
-        for (int j = i + 1; j <= dimension; ++j) {
+    for (int i = 1; i < dimension; ++i) {
+        for (int j = i + 1; j < dimension; ++j) {
             // No considerar pares que involucren al depósito
             if (i == deposito || j == deposito) continue;
             // Calcular ahorro: costo actual - costo si se conecta directamente i-j
@@ -67,13 +71,22 @@ vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
     // Caso donde no hay ahorros en las posibles fusiones y es mejor no fusionar las rutas 
     if (!ahorros.empty() && ahorros[0].valor <= 0) {
         // No hay fusiones CW que mejoren la solución.
-        vector<vector<int>> resultado_sin_cw_fusion;
-        for (int k = 1; k <= dimension; ++k) {
+        Solution sin_fusion(filePath);  // Creamos una Solution vacía
+        for (int k = 1; k < dimension; ++k) {
             if (rutas[k].size() > 2) { // Solo rutas con clientes
-                resultado_sin_cw_fusion.push_back(rutas[k]);
+                const vector<int>& ruta = rutas[k];
+                int cliente_inicial = ruta[1];
+                sin_fusion.addRuta(cliente_inicial);
+
+                for (int i = 2; i < ruta.size() - 1; ++i) {
+                    int atras = ruta[i - 1];
+                    int actual = ruta[i];
+                    int adelante = ruta[i + 1];
+                    sin_fusion.addClient(actual, sin_fusion.getRutas().size() - 1, atras, adelante);
+                }
             }
         }
-        return resultado_sin_cw_fusion;
+        return sin_fusion;
     }
     
     // Iterar sobre los ahorros ordenados para fusionar rutas si es posible
@@ -86,9 +99,11 @@ vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
         int ruta_j = -1; 
 
         // Buscar las rutas a las que pertenecen i y j
-        for (int k = 1; k <= dimension; ++k) {
-            if (!rutas[k].empty() && rutas[k][1] == i) ruta_i = k; // i está al inicio de ruta k
-            if (!rutas[k].empty() && rutas[k][rutas[k].size() - 2] == j) ruta_j = k; // j está al final de ruta k
+        for (int k = 1; k < dimension; ++k) {
+            if (!rutas[k].empty() && rutas[k][1] == i) }
+                ruta_i = k; // i está al inicio de ruta k
+            if (!rutas[k].empty() && rutas[k][rutas[k].size() - 2] == j) 
+                ruta_j = k; // j está al final de ruta k
         }
 
         // Solo fusionar si:
@@ -115,11 +130,22 @@ vector<vector<int>> clarke_wright(const VRPLIBReader& instancia) {
         }
     }
 
-    // Filtrar las rutas que quedaron vacías tras las fusiones
-    vector<vector<int>> resultado;
-    for (int k = 1; k <= dimension; ++k) {
-        if (!rutas[k].empty()) resultado.push_back(rutas[k]);
-    }
+    // Añadimos rutas fusionadas finales a la solución
+    for (int k = 1; k < dimension; ++k) {
+        if (!rutas[k].empty()) {
+            const vector<int>& ruta = rutas[k];
+            if (ruta.size() >= 3) {
+                int cliente_inicial = ruta[1];
+                sol.addRuta(cliente_inicial);
 
-    return resultado;
+                for (int i = 2; i < ruta.size() - 1; ++i) {
+                    int atras = ruta[i - 1];
+                    int actual = ruta[i];
+                    int adelante = ruta[i + 1];
+                    sol.addClient(actual, sol.getRutas().size() - 1, atras, adelante);
+                }
+            }
+        }
+
+    return sol;
 }
