@@ -1,7 +1,7 @@
 #include <iostream>
 #include "VRPLIBReader.h"
-#include "ClarkeWrightConRelocate.h"
-
+//#include "ClarkeWrightConRelocate.h"
+#include "InsertionHeuristic.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
         std::cout << std::endl;
     }
 
-    std::cout << "\nEjecutando Clarke & Wright con mejora relocate...\n" << std::endl;
-    std::vector<std::vector<int>> rutas = clarke_wright(reader);
-
+    std::cout << "\nEjecutando Heuristica de insercion...\n" << std::endl;
+    Solution sol = insertion(reader);
+    std::vector<vector<int>> rutas = sol.getRutas();
     std::cout << "Rutas generadas:\n";
     for (size_t i = 0; i < rutas.size(); ++i) {
         std::cout << "Ruta " << i + 1 << ": ";

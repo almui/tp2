@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int findClosestUnvisited(const VRPLIBReader& instancia, vector<int> unvisited);
+double findClosestUnvisited(const VRPLIBReader& instancia, vector<int> unvisited);
 
 Solution insertion(const VRPLIBReader& instancia);
 
