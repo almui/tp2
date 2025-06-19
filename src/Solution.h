@@ -17,9 +17,10 @@ public:
     void removeClient(int id, int ruta,int atras, int adelante);
     bool esValida(int ruta);
     vector<vector<int>> getRutas();
-    vector<int> getDistancias();
+    vector<double> getDistancias();
     VRPLIBReader getInstancia();
     void printSolution() const;
+    vector<int> getDemandas();
   
 //id deposito = 1
 
@@ -27,7 +28,7 @@ private:
     vector<vector<int>> _sol; //grafo dirigido cada posicion es un nodo, y el vector en esa posicion son los nodos a los que apunta
     vector<vector<int>> _rutas;// las rutas ordenadas. Ejemplo: {2,8,4};{3,5,6};{1,7}
     vector<int> _sumd;
-    vector<int> _distancias;
+    vector<double> _distancias;
     VRPLIBReader _instancia;
 
     bool contain(int id, vector<int> ruta);

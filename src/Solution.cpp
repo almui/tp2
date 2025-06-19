@@ -8,12 +8,12 @@ Solution::Solution(const VRPLIBReader& instancia) : _instancia(instancia)  {
 }
 
 void Solution::addRuta(int id){
-    _rutas.push_back({ id});
+    _rutas.push_back({1, id, 1});
     _sol[0].push_back(id);
-    _sol[id].push_back(0);
+    _sol[id].push_back(1);
     vector<int> demandas=_instancia.getDemands();
-    _sumd.push_back(demandas[id]);
-    _distancias.push_back(_instancia.getDistanceMatrix()[0][id] + _instancia.getDistanceMatrix()[id][0]);
+    _sumd.push_back(demandas[id+1]);
+    _distancias.push_back(_instancia.getDistanceMatrix()[1][id+1] + _instancia.getDistanceMatrix()[id+1][1]);
 }
 bool Solution::contain(int id, vector<int> ruta){
     for(int i=0;i<ruta.size(); i++){
@@ -32,16 +32,33 @@ int Solution::posicion(int id, vector<int> v){
     }
 }
 void Solution::addClient(int id, int ruta, int atras, int adelante){
-    if(contain(adelante, _sol[atras])){
-        _sol[atras].pop_back(); //solo tendrian que estar apuntando a un nodo, osea solo tendria un vector de un elemento 
+    
+    if(contain(adelante, _sol[atras]) && atras!=1){
+        int pos= posicion(adelante, _sol[atras]);
+        _sol[atras].erase(_sol[atras].begin() + pos);
+
     }
+
     _sol[atras].push_back(id);
     _sol[id].push_back(adelante);
-    int pos= posicion(adelante, _rutas[ruta]);
-    _rutas[ruta].insert(_rutas[ruta].begin() + pos, id);
-    _sumd[ruta]+=_instancia.getDemands()[id];
-    _distancias[ruta]+=_instancia.getDistanceMatrix()[atras][id] + _instancia.getDistanceMatrix()[id][adelante];
-    
+    _sumd[ruta]+=_instancia.getDemands()[id+1];
+
+ 
+    if (adelante == 1) {
+        _rutas[ruta].insert(_rutas[ruta].end() - 1, id);
+        _distancias[ruta]-=_instancia.getDistanceMatrix()[atras+1][1];
+        _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][id+1] + _instancia.getDistanceMatrix()[id+1][1];
+    } else if (atras == 1) {
+        _rutas[ruta].insert(_rutas[ruta].begin() + 1 , id);
+        _distancias[ruta]-=_instancia.getDistanceMatrix()[1][adelante+1];
+        _distancias[ruta]+=_instancia.getDistanceMatrix()[1][id+1] + _instancia.getDistanceMatrix()[id+1][adelante+1];
+
+    } else {
+        int pos = posicion(adelante, _rutas[ruta]);
+        _rutas[ruta].insert(_rutas[ruta].begin() + pos, id);
+        _distancias[ruta]-=_instancia.getDistanceMatrix()[atras+1][adelante+1];
+        _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][id+1] + _instancia.getDistanceMatrix()[id+1][adelante+1];
+    }
 }
 void Solution::removeClient(int id, int ruta,int atras, int adelante){
     _sol[atras].pop_back();
@@ -49,8 +66,9 @@ void Solution::removeClient(int id, int ruta,int atras, int adelante){
     _sol[atras].push_back(adelante);
     int pos= posicion(id, _rutas[ruta]);
     _rutas[ruta].erase(_rutas[ruta].begin() + pos);
-    _sumd[ruta]-=_instancia.getDemands()[id];
-    _distancias[ruta]-=_instancia.getDistanceMatrix()[atras][id] + _instancia.getDistanceMatrix()[id][adelante];
+    _sumd[ruta]-=_instancia.getDemands()[id+1];
+    _distancias[ruta]-=_instancia.getDistanceMatrix()[atras+1][id+1] + _instancia.getDistanceMatrix()[id+1][adelante+1];
+    _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][adelante+1];
 }
 bool Solution::esValida(int ruta){
     if(_sumd[ruta]<=_instancia.getCapacity()){
@@ -60,10 +78,13 @@ bool Solution::esValida(int ruta){
 
     }
 }
+vector<int> Solution::getDemandas(){
+    return _sumd;
+}
 vector<vector<int>> Solution::getRutas(){
     return _rutas;
 }
-vector<int> Solution::getDistancias(){
+vector<double> Solution::getDistancias(){
     return _distancias;
 }
 VRPLIBReader Solution::getInstancia(){
@@ -91,7 +112,7 @@ void Solution::printSolution() const{
              << setw(10) << _distancias[i] << "  "
              << setw(4) << _rutas[i].size() << "     ";
 
-        for (int j = 0; j <_rutas[i].size(); ++j) {
+        for (int j = 1; j <_rutas[i].size()-1; ++j) {
             cout << _rutas[i][j] << " ";
         }
         cout << endl;
