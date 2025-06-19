@@ -6,6 +6,8 @@
 
 using namespace std;
 
-double calcularCostoTotal(const vector<vector<int>>& rutas, const vector<vector<double>>& matriz_distancias);
+double calcularCostoTotal(Solution sol);
+
+int calcularDemandaRuta(Solution sol, int indexRuta);
 
 #endif
