@@ -71,23 +71,23 @@ void Solution::removeClient(int id, int ruta,int atras, int adelante){
     _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][adelante+1];
 }
 bool Solution::esValida(int ruta){
-    if(_sumd[ruta]<=_instancia.getCapacity()){
+    if(_sumd[ruta]<=_instancia.getCapacity() && _rutas.size()<=_instancia.getNumVehicles()){
         return true;
     } else{
         return false;
 
     }
 }
-vector<int> Solution::getDemandas(){
+vector<int> Solution::getDemandas() const{
     return _sumd;
 }
-vector<vector<int>> Solution::getRutas(){
+vector<vector<int>> Solution::getRutas() const{
     return _rutas;
 }
-vector<double> Solution::getDistancias(){
+vector<double> Solution::getDistancias() const{
     return _distancias;
 }
-VRPLIBReader Solution::getInstancia(){
+VRPLIBReader Solution::getInstancia() const{
     return _instancia;
 }
 void Solution::printSolution() const{

@@ -16,11 +16,11 @@ public:
     void addClient(int id, int ruta, int atras, int adelante);
     void removeClient(int id, int ruta,int atras, int adelante);
     bool esValida(int ruta);
-    vector<vector<int>> getRutas();
-    vector<double> getDistancias();
-    VRPLIBReader getInstancia();
+    vector<vector<int>> getRutas() const;
+    vector<double> getDistancias() const;
+    VRPLIBReader getInstancia() const;
     void printSolution() const;
-    vector<int> getDemandas();
+    vector<int> getDemandas() const;
   
 //id deposito = 1
 

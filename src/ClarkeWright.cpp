@@ -22,9 +22,9 @@ void ordenar_ahorros(vector<Ahorro>& ahorros) {
 
 
 // Clarke & Wright + llamada a relocate al final
-Solution clarke_wright(const VRPLIBReader& instancia) {
-    VRPLIBReader instancia(filePath);
-    Solution sol(filePath);
+Solution clarke_wright(const VRPLIBReader& instancia){
+
+    Solution sol(instancia);
     
     // Obtener el ID del depósito de la instancia (normalmente nodo 0 o similar)
     int deposito = instancia.getDepotId();
@@ -71,7 +71,7 @@ Solution clarke_wright(const VRPLIBReader& instancia) {
     // Caso donde no hay ahorros en las posibles fusiones y es mejor no fusionar las rutas 
     if (!ahorros.empty() && ahorros[0].valor <= 0) {
         // No hay fusiones CW que mejoren la solución.
-        Solution sin_fusion(filePath);  // Creamos una Solution vacía
+        Solution sin_fusion(instancia);  // Creamos una Solution vacía
         for (int k = 1; k < dimension; ++k) {
             if (rutas[k].size() > 2) { // Solo rutas con clientes
                 const vector<int>& ruta = rutas[k];
@@ -100,10 +100,12 @@ Solution clarke_wright(const VRPLIBReader& instancia) {
 
         // Buscar las rutas a las que pertenecen i y j
         for (int k = 1; k < dimension; ++k) {
-            if (!rutas[k].empty() && rutas[k][1] == i) }
+            if (!rutas[k].empty() && rutas[k][1] == i) {
                 ruta_i = k; // i está al inicio de ruta k
-            if (!rutas[k].empty() && rutas[k][rutas[k].size() - 2] == j) 
+            }
+            if (!rutas[k].empty() && rutas[k][rutas[k].size() - 2] == j) {
                 ruta_j = k; // j está al final de ruta k
+            }
         }
 
         // Solo fusionar si:
@@ -131,14 +133,14 @@ Solution clarke_wright(const VRPLIBReader& instancia) {
     }
 
     // Añadimos rutas fusionadas finales a la solución
-    for (int k = 1; k < dimension; ++k) {
+    for(int k = 1; k < dimension; k++) {
         if (!rutas[k].empty()) {
             const vector<int>& ruta = rutas[k];
             if (ruta.size() >= 3) {
                 int cliente_inicial = ruta[1];
                 sol.addRuta(cliente_inicial);
 
-                for (int i = 2; i < ruta.size() - 1; ++i) {
+                for (int i = 2; i < ruta.size() - 1; i++) {
                     int atras = ruta[i - 1];
                     int actual = ruta[i];
                     int adelante = ruta[i + 1];
@@ -148,4 +150,5 @@ Solution clarke_wright(const VRPLIBReader& instancia) {
         }
 
     return sol;
+}
 }
