@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include "VRPLIBReader.h"
-
+#include "Solution.h"
 #include <vector>
 
 using namespace std;

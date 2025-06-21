@@ -30,36 +30,31 @@ int Solution::posicion(int id, vector<int> v){
             return i;
         }
     }
+    return -1;
 }
-void Solution::addClient(int id, int ruta, int atras, int adelante){
-    
-    if(contain(adelante, _sol[atras]) && atras!=1){
-        int pos= posicion(adelante, _sol[atras]);
-        _sol[atras].erase(_sol[atras].begin() + pos);
+void Solution::addClient(int id, int ruta, int posicion) {
+    vector<int>& r = _rutas[ruta];
 
-    }
+    // Insertar en la secuencia de la ruta
+    r.insert(r.begin() + posicion, id);
 
-    _sol[atras].push_back(id);
-    _sol[id].push_back(adelante);
-    _sumd[ruta]+=_instancia.getDemands()[id+1];
+    // Actualizar el grafo (_sol)
+    int anterior = r[posicion - 1];
+    int siguiente = r[posicion + 1];
 
- 
-    if (adelante == 1) {
-        _rutas[ruta].insert(_rutas[ruta].end() - 1, id);
-        _distancias[ruta]-=_instancia.getDistanceMatrix()[atras+1][1];
-        _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][id+1] + _instancia.getDistanceMatrix()[id+1][1];
-    } else if (atras == 1) {
-        _rutas[ruta].insert(_rutas[ruta].begin() + 1 , id);
-        _distancias[ruta]-=_instancia.getDistanceMatrix()[1][adelante+1];
-        _distancias[ruta]+=_instancia.getDistanceMatrix()[1][id+1] + _instancia.getDistanceMatrix()[id+1][adelante+1];
+    _sol[anterior].clear();  // Quitamos anterior → siguiente
+    _sol[anterior].push_back(id);
+    _sol[id].push_back(siguiente);
 
-    } else {
-        int pos = posicion(adelante, _rutas[ruta]);
-        _rutas[ruta].insert(_rutas[ruta].begin() + pos, id);
-        _distancias[ruta]-=_instancia.getDistanceMatrix()[atras+1][adelante+1];
-        _distancias[ruta]+=_instancia.getDistanceMatrix()[atras+1][id+1] + _instancia.getDistanceMatrix()[id+1][adelante+1];
-    }
+    // Actualizar demanda
+    _sumd[ruta] += _instancia.getDemands()[id + 1];
+
+    // Actualizar distancia
+    const auto& dist = _instancia.getDistanceMatrix();
+    _distancias[ruta] -= dist[anterior + 1][siguiente + 1];
+    _distancias[ruta] += dist[anterior + 1][id + 1] + dist[id + 1][siguiente + 1];
 }
+
 void Solution::removeClient(int id, int ruta,int atras, int adelante){
     _sol[atras].pop_back();
     _sol[id].pop_back();

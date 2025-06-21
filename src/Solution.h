@@ -13,7 +13,6 @@ class Solution {
 public:
     Solution(const VRPLIBReader& instancia);
     void addRuta(int id);
-    void addClient(int id, int ruta, int atras, int adelante);
     void removeClient(int id, int ruta,int atras, int adelante);
     bool esValida(int ruta);
     vector<vector<int>> getRutas() const;
@@ -21,6 +20,7 @@ public:
     VRPLIBReader getInstancia() const;
     void printSolution() const;
     vector<int> getDemandas() const;
+    void addClient(int id, int ruta, int posicion);
   
 //id deposito = 1
 

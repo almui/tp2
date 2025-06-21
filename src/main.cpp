@@ -1,6 +1,7 @@
 #include <iostream>
 #include "VRPLIBReader.h"
-//#include "ClarkeWrightConRelocate.h"
+#include "ClarkeWright.h"
+#include "Solution.h"
 #include "InsertionHeuristic.h"
 
 int main(int argc, char* argv[]) {
