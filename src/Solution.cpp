@@ -9,8 +9,8 @@ Solution::Solution(const VRPLIBReader& instancia) : _instancia(instancia) {
 void Solution::addRuta(int id) {
     _rutas.push_back({1, id, 1});
     vector<int> demandas = _instancia.getDemands();
-    _sumd.push_back(demandas[id + 1]);
-    _distancias.push_back(_instancia.getDistanceMatrix()[1][id + 1] + _instancia.getDistanceMatrix()[id + 1][1]);
+    _sumd.push_back(demandas[id-1]);
+    _distancias.push_back(_instancia.getDistanceMatrix()[1][id-1] + _instancia.getDistanceMatrix()[id-1][1]);
 }
 
 bool Solution::contain(int id, vector<int> ruta) {
@@ -50,18 +50,25 @@ void Solution::addClient(int id, int ruta, int posicion) {
     _distancias[ruta] += dist[anterior + 1][id + 1] + dist[id + 1][siguiente + 1];
 }
 
-void Solution::removeClient(int id, int ruta, int atras, int adelante) {
-    // Find and remove client from route
-    int pos = posicion(id, _rutas[ruta]);
-    _rutas[ruta].erase(_rutas[ruta].begin() + pos);
+void Solution::removeClient(int ruta, int posicion) {
+    vector<int>& r = _rutas[ruta];
+    int id = r[posicion];
     
     // Update demand
     _sumd[ruta] -= _instancia.getDemands()[id + 1];
     
-    // Update distance - remove old distances and add direct connection
-    _distancias[ruta] -= _instancia.getDistanceMatrix()[atras + 1][id + 1] + _instancia.getDistanceMatrix()[id + 1][adelante + 1];
-    _distancias[ruta] += _instancia.getDistanceMatrix()[atras + 1][adelante + 1];
+    // Update distance
+    const auto& dist = _instancia.getDistanceMatrix();
+    int anterior = r[posicion - 1];
+    int siguiente = r[posicion + 1];
+    
+    _distancias[ruta] -= dist[anterior + 1][id + 1] + dist[id + 1][siguiente + 1];
+    _distancias[ruta] += dist[anterior + 1][siguiente + 1];
+    
+    // Remove client from route
+    r.erase(r.begin() + posicion);
 }
+
 
 bool Solution::esValida(int ruta) {
     return (_sumd[ruta] <= _instancia.getCapacity() && _rutas.size() <= _instancia.getNumVehicles());
@@ -105,7 +112,7 @@ void Solution::printSolution() const {
              << setw(10) << _distancias[i] << " "
              << setw(4) << _rutas[i].size() << " ";
              
-        for (int j = 1; j < _rutas[i].size() - 1; ++j) {
+        for (int j = 0; j < _rutas[i].size(); ++j) {
             cout << _rutas[i][j] << " ";
         }
         cout << endl;

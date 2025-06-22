@@ -48,55 +48,37 @@ Solution insertion(const VRPLIBReader& instancia){
     for (int i=2; i<(dimension+1); i++){
         unvisited.push_back(i);
     }
-    
+
     while (unvisited.size()>0){
         int closest_node = findClosestUnvisited(instancia, unvisited);
-        cout<<"a"<<closest_node<<"\n";
+        cout<<closest_node<<"\n";
 
         double best_cost = 100000000;
-        int best_ruta = 0;
-        bool best_is_new = false;
+        int best_ruta = -1;
+
+        vector<vector<int>> rutas = sol.getRutas();
+
+        Solution sol2 = sol;
+
+        double costoConRutaNueva = calcularCostoTotal(sol2);
+        sol2.addRuta(closest_node);
         
-        const auto original_rutas = sol.getRutas();
-        const auto original_distancias = sol.getDistancias();
-        const auto original_demandas = sol.getDemandas();
-
-        //opcion insertar al final de cada ruta
-        for (int i = 0; i < original_rutas.size(); i++) {
-            const auto& ruta = original_rutas[i];
-
-            Solution temp_sol = sol;
+        for (int i = 0; i < rutas.size(); i++) {
+            int original_size = rutas[i].size();
             
-            temp_sol.addClient(closest_node, i, ruta.size() - 2); 
-            double new_cost = calcularCostoTotal(temp_sol);
-            if (new_cost < best_cost) {
-                best_cost = new_cost;
-                best_ruta = i;
-                best_is_new = false;
-            }
+            // Add at second to last position
+            sol.addClient(closest_node, i, original_size - 1);
+            sol.printSolution();
+            // Remove the same element we just added (at same logical position)
+            sol.removeClient(i, original_size - 1); // Same position after addition
+            sol.printSolution();
+        
         }
 
-        //opcion crear nueva ruta
-        {
-            Solution temp_sol = sol;
-            temp_sol.addRuta(closest_node);
-            double new_cost = calcularCostoTotal(temp_sol);
-            if (new_cost < best_cost) {
-                best_cost = new_cost;
-                best_is_new = true;
-            }
-        }
-        // Apply best option to actual solution
-        if (best_is_new) {
-            sol.addRuta(closest_node);
-        } else {
-            const auto& ruta = sol.getRutas()[best_ruta];
-            sol.addClient(closest_node, best_ruta, ruta.size()-2);
-        }
-
-        // Remove node from unvisited
+        sol = sol2;
         removeNodeFromVector(unvisited, closest_node);
     }
+    cout<<"done\n";
     sol.printSolution();
     return sol;
 

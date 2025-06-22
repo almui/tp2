@@ -13,7 +13,7 @@ class Solution {
 public:
     Solution(const VRPLIBReader& instancia);
     void addRuta(int id);
-    void removeClient(int id, int ruta,int atras, int adelante);
+    void removeClient(int ruta, int posicion);
     bool esValida(int ruta);
     vector<vector<int>> getRutas() const;
     vector<double> getDistancias() const;
