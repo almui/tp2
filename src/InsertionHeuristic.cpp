@@ -52,30 +52,36 @@ Solution insertion(const VRPLIBReader& instancia){
     while (unvisited.size()>0){
         int closest_node = findClosestUnvisited(instancia, unvisited);
         cout<<closest_node<<"\n";
-
-        double best_cost = 100000000;
+        
+        double best_cost_insertando = 100000000;
         int best_ruta = -1;
 
         vector<vector<int>> rutas = sol.getRutas();
 
         Solution sol2 = sol;
 
-        double costoConRutaNueva = calcularCostoTotal(sol2);
         sol2.addRuta(closest_node);
+        double costoConRutaNueva = calcularCostoTotal(sol2);
         
         for (int i = 0; i < rutas.size(); i++) {
             int original_size = rutas[i].size();
             
-            // Add at second to last position
             sol.addClient(closest_node, i, original_size - 1);
-            sol.printSolution();
-            // Remove the same element we just added (at same logical position)
+            double tempCost = calcularCostoTotal(sol);
+            if(tempCost<best_cost_insertando && sol.esValida(i)){
+                best_ruta = i;
+                best_cost_insertando = tempCost;
+            }
             sol.removeClient(i, original_size - 1); // Same position after addition
-            sol.printSolution();
         
         }
 
-        sol = sol2;
+        if(best_cost_insertando<costoConRutaNueva){
+            sol.addClient(closest_node, best_ruta, rutas[best_ruta].size()-1);
+        }
+        else{
+            sol = sol2;
+        }
         removeNodeFromVector(unvisited, closest_node);
     }
     cout<<"done\n";

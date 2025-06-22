@@ -10,4 +10,6 @@ double calcularCostoTotal(Solution sol);
 
 void removeNodeFromVector(vector<int>& v, int n);
 
+void printRuta (vector<int>& v);
+
 #endif

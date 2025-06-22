@@ -38,7 +38,7 @@ void Solution::addClient(int id, int ruta, int posicion) {
     r.insert(r.begin() + posicion, id);
     
     // Update demand
-    _sumd[ruta] += _instancia.getDemands()[id + 1];
+    _sumd[ruta] += _instancia.getDemands()[id];
     
     // Update distance
     const auto& dist = _instancia.getDistanceMatrix();
@@ -46,8 +46,8 @@ void Solution::addClient(int id, int ruta, int posicion) {
     int siguiente = r[posicion + 1];
     
     // Remove old distance (anterior -> siguiente) and add new distances (anterior -> id -> siguiente)
-    _distancias[ruta] -= dist[anterior + 1][siguiente + 1];
-    _distancias[ruta] += dist[anterior + 1][id + 1] + dist[id + 1][siguiente + 1];
+    _distancias[ruta] -= dist[anterior][siguiente];
+    _distancias[ruta] += dist[anterior][id] + dist[id][siguiente];
 }
 
 void Solution::removeClient(int ruta, int posicion) {
@@ -55,15 +55,15 @@ void Solution::removeClient(int ruta, int posicion) {
     int id = r[posicion];
     
     // Update demand
-    _sumd[ruta] -= _instancia.getDemands()[id + 1];
+    _sumd[ruta] -= _instancia.getDemands()[id];
     
     // Update distance
     const auto& dist = _instancia.getDistanceMatrix();
     int anterior = r[posicion - 1];
     int siguiente = r[posicion + 1];
     
-    _distancias[ruta] -= dist[anterior + 1][id + 1] + dist[id + 1][siguiente + 1];
-    _distancias[ruta] += dist[anterior + 1][siguiente + 1];
+    _distancias[ruta] -= dist[anterior][id] + dist[id][siguiente];
+    _distancias[ruta] += dist[anterior][siguiente];
     
     // Remove client from route
     r.erase(r.begin() + posicion);
