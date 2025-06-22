@@ -25,9 +25,8 @@ public:
 //id deposito = 1
 
 private:
-    vector<vector<int>> _sol; //grafo dirigido cada posicion es un nodo, y el vector en esa posicion son los nodos a los que apunta
-    vector<vector<int>> _rutas;// las rutas ordenadas. Ejemplo: {2,8,4};{3,5,6};{1,7}
-    vector<int> _sumd;
+    vector<vector<int>> _rutas;// las rutas ordenadas empiezan y terminan en 1
+    vector<int> _sumd; 
     vector<double> _distancias;
     VRPLIBReader _instancia;
 
