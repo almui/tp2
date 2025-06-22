@@ -52,32 +52,30 @@ Solution insertion(const VRPLIBReader& instancia){
     while (unvisited.size()>0){
         int closest_node = findClosestUnvisited(instancia, unvisited);
         cout<<closest_node<<"\n";
-        
         double best_cost_insertando = 100000000;
         int best_ruta = -1;
-
+        int best_position = -1;
         vector<vector<int>> rutas = sol.getRutas();
-
         Solution sol2 = sol;
-
         sol2.addRuta(closest_node);
         double costoConRutaNueva = calcularCostoTotal(sol2);
         
         for (int i = 0; i < rutas.size(); i++) {
             int original_size = rutas[i].size();
-            
-            sol.addClient(closest_node, i, original_size - 1);
-            double tempCost = calcularCostoTotal(sol);
-            if(tempCost<best_cost_insertando && sol.esValida(i)){
-                best_ruta = i;
-                best_cost_insertando = tempCost;
+            for (int pos = 1; pos < original_size - 1; pos++) {
+                sol.addClient(closest_node, i, pos);
+                double tempCost = calcularCostoTotal(sol);
+                if(tempCost < best_cost_insertando && sol.esValida(i)){
+                    best_ruta = i;
+                    best_position = pos;
+                    best_cost_insertando = tempCost;
+                }
+                sol.removeClient(i, pos);
             }
-            sol.removeClient(i, original_size - 1); // Same position after addition
-        
         }
-
-        if(best_cost_insertando<costoConRutaNueva){
-            sol.addClient(closest_node, best_ruta, rutas[best_ruta].size()-1);
+        
+        if(best_cost_insertando < costoConRutaNueva){
+            sol.addClient(closest_node, best_ruta, best_position);
         }
         else{
             sol = sol2;
