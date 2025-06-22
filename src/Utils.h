@@ -3,11 +3,11 @@
 #include "VRPLIBReader.h"
 #include "Solution.h"
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 
 double calcularCostoTotal(Solution sol);
 
-int calcularDemandaRuta(Solution sol, int indexRuta);
+void removeNodeFromVector(vector<int>& v, int n);
 
 #endif
