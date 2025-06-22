@@ -34,7 +34,6 @@ int Solution::posicion(int id, vector<int> v){
 }
 void Solution::addClient(int id, int ruta, int posicion) {
     vector<int>& r = _rutas[ruta];
-
     // Insertar en la secuencia de la ruta
     r.insert(r.begin() + posicion, id);
 

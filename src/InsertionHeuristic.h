@@ -6,8 +6,8 @@
 #include <vector>
 
 using namespace std;
-
-double findClosestUnvisited(const VRPLIBReader& instancia, vector<int> unvisited);
+//devuelve el nodo no visitado mas cercano al deposito
+int findClosestUnvisited(const VRPLIBReader& instancia, vector<int> unvisited);
 
 Solution insertion(const VRPLIBReader& instancia);
 
