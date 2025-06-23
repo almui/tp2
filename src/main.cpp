@@ -35,17 +35,18 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "\nEjecutando Heuristica de insercion...\n" << std::endl;
-    Solution sol = insertion(reader);
+    Solution sol = clarke_wright(reader);
     std::vector<vector<int>> rutas = sol.getRutas();
-    std::cout << "Rutas generadas:\n";
-    for (size_t i = 0; i < rutas.size(); ++i) {
-        std::cout << "Ruta " << i + 1 << ": ";
-        for (int cliente : rutas[i]) {
-            std::cout << cliente << " ";
-        }
-        std::cout << std::endl;
-    }
-
+    // vector<vector<int>> rutas = clarke_wright(reader);
+    // std::cout << "Rutas generadas:\n";
+    // for (size_t i = 0; i < rutas.size(); ++i) {
+    //     std::cout << "Ruta " << i + 1 << ": ";
+    //     for (int cliente : rutas[i]) {
+    //         std::cout << cliente << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+    sol.printSolution();
     return 0;
 }
 
