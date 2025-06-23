@@ -9,8 +9,8 @@ Solution::Solution(const VRPLIBReader& instancia) : _instancia(instancia) {
 void Solution::addRuta(int id) {
     _rutas.push_back({1, id, 1});
     vector<int> demandas = _instancia.getDemands();
-    _sumd.push_back(demandas[id-1]);
-    _distancias.push_back(_instancia.getDistanceMatrix()[1][id-1] + _instancia.getDistanceMatrix()[id-1][1]);
+    _sumd.push_back(demandas[id]);
+    _distancias.push_back(_instancia.getDistanceMatrix()[1][id] + _instancia.getDistanceMatrix()[id][1]);
 }
 
 bool Solution::contain(int id, vector<int> ruta) {
