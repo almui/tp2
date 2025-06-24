@@ -4,93 +4,102 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
-// Ordenar ahorros de mayor a menor
-void ordenar_ahorros(vector<Ahorro>& ahorros) {
-    for (int i = 0; i < ahorros.size() - 1; ++i) {
-        for (int j = i + 1; j < ahorros.size(); ++j) {
-            if (ahorros[j].valor > ahorros[i].valor) {
-                Ahorro temp = ahorros[i];
-                ahorros[i] = ahorros[j];
-                ahorros[j] = temp;
+// Usar la estructura Ahorro definida en el header
+
+// Función para encontrar en qué ruta está un nodo y en qué posición
+pair<int, int> encontrar_nodo_en_rutas(const vector<vector<int>>& rutas, int nodo, int dimension) {
+    for (int k = 1; k <= dimension; ++k) {
+        if (rutas[k].size() > 2) { // Solo rutas con clientes
+            for (int pos = 1; pos < rutas[k].size() - 1; ++pos) {
+                if (rutas[k][pos] == nodo) {
+                    return {k, pos}; // {índice_ruta, posición_en_ruta}
+                }
             }
         }
     }
+    return {-1, -1}; // No encontrado
 }
 
+// Función para verificar si dos nodos pueden fusionarse
+bool pueden_fusionarse(const vector<vector<int>>& rutas, int i, int j, 
+                      int ruta_i, int pos_i, int ruta_j, int pos_j) {
+    if (ruta_i == ruta_j) return false; // Mismo ruta
+    if (ruta_i == -1 || ruta_j == -1) return false; // Alguno no encontrado
+    
+    // Verificar que i esté al final de su ruta y j al inicio de la suya
+    bool i_al_final = (pos_i == rutas[ruta_i].size() - 2);
+    bool j_al_inicio = (pos_j == 1);
+    
+    // O que j esté al final de su ruta e i al inicio de la suya
+    bool j_al_final = (pos_j == rutas[ruta_j].size() - 2);
+    bool i_al_inicio = (pos_i == 1);
+    
+    return (i_al_final && j_al_inicio) || (j_al_final && i_al_inicio);
+}
 
-// Clarke & Wright + llamada a relocate al final
+// Clarke & Wright mejorado
 Solution clarke_wright(const VRPLIBReader& instancia) {
-    // Obtener el ID del depósito de la instancia (normalmente nodo 0 o similar)
+    // Obtener parámetros de la instancia
     int deposito = instancia.getDepotId();
-    // Obtener la cantidad total de nodos (incluyendo depósito y clientes)
     int dimension = instancia.getDimension();
-    // Obtener la capacidad máxima de los vehículos
     int capacidad = instancia.getCapacity();
-    // Obtener la lista de demandas de los clientes
     const vector<int>& demandas = instancia.getDemands();
-    // Obtener la matriz de distancias entre todos los nodos
     const auto& dist = instancia.getDistanceMatrix();
 
-    // Inicializar un vector de rutas, una para cada nodo (de tamaño dimension+1)
-    // Las rutas se almacenan como vectores de enteros (nodos)
+    // Inicializar rutas y demandas
     vector<vector<int>> rutas(dimension + 1);
-    // Vector para almacenar la demanda acumulada de cada ruta
     vector<int> demanda_ruta(dimension + 1, 0);
 
-    // Crear rutas iniciales triviales: cada cliente tiene su propia ruta [deposito, cliente, deposito]
+    // Crear rutas iniciales: cada cliente tiene su propia ruta
     for (int i = 1; i <= dimension; ++i) {
-        if (i == deposito) continue; // No tener en cuenta el depósito 
-        rutas[i] = {deposito, i, deposito}; // Ruta con un solo cliente
-        demanda_ruta[i] = demandas[i];      // Demanda correspondiente al cliente
+        if (i == deposito) continue;
+        rutas[i] = {deposito, i, deposito};
+        demanda_ruta[i] = demandas[i];
     }
 
-    // Vector para almacenar los ahorros calculados para posibles fusiones de rutas
+    // Calcular ahorros para todos los pares de clientes
     vector<Ahorro> ahorros;
-
-    // Calcular los ahorros para todas los pares de clientes (i, j)
     for (int i = 1; i <= dimension; ++i) {
         for (int j = i + 1; j <= dimension; ++j) {
-            // No considerar pares que involucren al depósito
             if (i == deposito || j == deposito) continue;
-            // Calcular ahorro: costo actual - costo si se conecta directamente i-j
+            
             double ahorro = dist[deposito][i] + dist[deposito][j] - dist[i][j];
-            // Guardar el ahorro junto con los nodos involucrados
-            ahorros.push_back({i, j, ahorro});
+            if (ahorro > 0) { // Solo considerar ahorros positivos
+                Ahorro a;
+                a.i = i;
+                a.j = j;
+                a.valor = ahorro;
+                ahorros.push_back(a);
+            }
         }
     }
 
-    // Ordenar los ahorros de mayor a menor para aplicar primero las fusiones más beneficiosas y que se consideren las que resultan un ahorro > 0
-    ordenar_ahorros(ahorros);
-
-    // Caso donde no hay ahorros en las posibles fusiones y es mejor no fusionar las rutas 
-    if (!ahorros.empty() && ahorros[0].valor <= 0) {
-        // No hay fusiones CW que mejoren la solución.
-        vector<vector<int>> resultado_sin_cw_fusion;
+    // Si no hay ahorros positivos, devolver rutas individuales
+    if (ahorros.empty()) {
+        vector<vector<int>> resultado_sin_fusion;
         for (int k = 1; k <= dimension; ++k) {
-            if (rutas[k].size() > 2) { // Solo rutas con clientes
-                resultado_sin_cw_fusion.push_back(rutas[k]);
+            if (rutas[k].size() > 2) {
+                resultado_sin_fusion.push_back(rutas[k]);
             }
         }
         
-        // Create Solution object
         Solution solution(instancia);
-        solution._rutas = resultado_sin_cw_fusion;
+        solution._rutas = resultado_sin_fusion;
         
-        // Calculate demands and distances for each route
-        for (int i = 0; i < resultado_sin_cw_fusion.size(); ++i) {
-            const vector<int>& ruta = resultado_sin_cw_fusion[i];
+        // Calcular demandas y distancias
+        for (int i = 0; i < resultado_sin_fusion.size(); ++i) {
+            const vector<int>& ruta = resultado_sin_fusion[i];
             
-            // Calculate demand
             int demanda_total = 0;
-            for (int j = 1; j < ruta.size() - 1; ++j) { // Skip depot at start and end
+            for (int j = 1; j < ruta.size() - 1; ++j) {
                 demanda_total += demandas[ruta[j]];
             }
             solution._sumd.push_back(demanda_total);
             
-            // Calculate distance
             double distancia_total = 0.0;
             for (int j = 0; j < ruta.size() - 1; ++j) {
                 distancia_total += dist[ruta[j]][ruta[j + 1]];
@@ -100,74 +109,108 @@ Solution clarke_wright(const VRPLIBReader& instancia) {
         
         return solution;
     }
-    
-    // Iterar sobre los ahorros ordenados para fusionar rutas si es posible
-    for (const Ahorro& a : ahorros) {
-        int i = a.i; 
-        int j = a.j; 
 
-        // Índices de las rutas que contienen i y j
-        int ruta_i = -1;
-        int ruta_j = -1; 
+    // Ordenar ahorros de mayor a menor usando std::sort
+    sort(ahorros.begin(), ahorros.end(), 
+         [](const Ahorro& a, const Ahorro& b) { 
+             return a.valor > b.valor; 
+         });
 
-        // Buscar las rutas a las que pertenecen i y j
-        for (int k = 1; k <= dimension; ++k) {
-            if (!rutas[k].empty() && rutas[k][1] == i) ruta_i = k; // i está al inicio de ruta k
-            if (!rutas[k].empty() && rutas[k][rutas[k].size() - 2] == j) ruta_j = k; // j está al final de ruta k
+    // Procesar ahorros para fusionar rutas
+    for (const Ahorro& ahorro : ahorros) {
+        int i = ahorro.i;
+        int j = ahorro.j;
+
+        // Encontrar posiciones de i y j en las rutas
+        auto pos_i = encontrar_nodo_en_rutas(rutas, i, dimension);
+        auto pos_j = encontrar_nodo_en_rutas(rutas, j, dimension);
+        
+        int ruta_i = pos_i.first;
+        int ruta_j = pos_j.first;
+        int posicion_i = pos_i.second;
+        int posicion_j = pos_j.second;
+
+        // Verificar si pueden fusionarse
+        if (!pueden_fusionarse(rutas, i, j, ruta_i, posicion_i, ruta_j, posicion_j)) {
+            continue;
         }
 
-        // Solo fusionar si:
-        // - Ambos nodos están en rutas diferentes
-        // - No son rutas vacías
-        if (ruta_i != -1 && ruta_j != -1 && ruta_i != ruta_j) {
-            // Comprobar que la suma de demandas no exceda la capacidad máxima
-            if (demanda_ruta[ruta_i] + demanda_ruta[ruta_j] <= capacidad) {
-                vector<int>& r_i = rutas[ruta_i]; // Ruta de i
-                vector<int>& r_j = rutas[ruta_j]; // Ruta de j
+        // Verificar restricción de capacidad
+        if (demanda_ruta[ruta_i] + demanda_ruta[ruta_j] > capacidad) {
+            continue;
+        }
 
-                r_j.pop_back(); // Remover el depósito final de la ruta j para fusionar
+        // Determinar el orden de fusión
+        vector<int> nueva_ruta;
+        nueva_ruta.push_back(deposito);
 
-                // Añadir todos los nodos de r_i (excepto depósitos) al final de r_j
-                for (int idx = 1; idx < r_i.size() - 1; ++idx) {
-                    r_j.push_back(r_i[idx]);
-                }
-                r_j.push_back(deposito); // Añadir de nuevo el depósito al final
-
-                // Actualizar la demanda acumulada de la ruta fusionada
-                demanda_ruta[ruta_j] += demanda_ruta[ruta_i];
-                rutas[ruta_i].clear(); // Vaciar la ruta i ya que fue fusionada
+        // Caso 1: i al final de ruta_i, j al inicio de ruta_j
+        if (posicion_i == rutas[ruta_i].size() - 2 && posicion_j == 1) {
+            // Agregar clientes de ruta_i (sin depósitos)
+            for (int idx = 1; idx < rutas[ruta_i].size() - 1; ++idx) {
+                nueva_ruta.push_back(rutas[ruta_i][idx]);
+            }
+            // Agregar clientes de ruta_j (sin depósitos)
+            for (int idx = 1; idx < rutas[ruta_j].size() - 1; ++idx) {
+                nueva_ruta.push_back(rutas[ruta_j][idx]);
             }
         }
+        // Caso 2: j al final de ruta_j, i al inicio de ruta_i
+        else if (posicion_j == rutas[ruta_j].size() - 2 && posicion_i == 1) {
+            // Agregar clientes de ruta_j (sin depósitos)
+            for (int idx = 1; idx < rutas[ruta_j].size() - 1; ++idx) {
+                nueva_ruta.push_back(rutas[ruta_j][idx]);
+            }
+            // Agregar clientes de ruta_i (sin depósitos)
+            for (int idx = 1; idx < rutas[ruta_i].size() - 1; ++idx) {
+                nueva_ruta.push_back(rutas[ruta_i][idx]);
+            }
+        }
+        else {
+            continue; // No se puede fusionar en esta configuración
+        }
+
+        nueva_ruta.push_back(deposito);
+
+        // Actualizar las estructuras de datos
+        rutas[ruta_j] = nueva_ruta;
+        demanda_ruta[ruta_j] = demanda_ruta[ruta_i] + demanda_ruta[ruta_j];
+        
+        // Limpiar la ruta fusionada
+        rutas[ruta_i].clear();
+        demanda_ruta[ruta_i] = 0;
     }
 
-    // Filtrar las rutas que quedaron vacías tras las fusiones
+    // Recopilar rutas finales no vacías
     vector<vector<int>> resultado;
     for (int k = 1; k <= dimension; ++k) {
-        if (!rutas[k].empty()) resultado.push_back(rutas[k]);
+        if (!rutas[k].empty()) {
+            resultado.push_back(rutas[k]);
+        }
     }
-    
-    // Create Solution object
+
+    // Crear objeto Solution
     Solution solution(instancia);
     solution._rutas = resultado;
-    
-    // Calculate demands and distances for each route
+
+    // Calcular demandas y distancias para cada ruta
     for (int i = 0; i < resultado.size(); ++i) {
         const vector<int>& ruta = resultado[i];
         
-        // Calculate demand
+        // Calcular demanda total
         int demanda_total = 0;
-        for (int j = 1; j < ruta.size() - 1; ++j) { // Skip depot at start and end
+        for (int j = 1; j < ruta.size() - 1; ++j) { // Excluir depósitos
             demanda_total += demandas[ruta[j]];
         }
         solution._sumd.push_back(demanda_total);
         
-        // Calculate distance
+        // Calcular distancia total
         double distancia_total = 0.0;
         for (int j = 0; j < ruta.size() - 1; ++j) {
             distancia_total += dist[ruta[j]][ruta[j + 1]];
         }
         solution._distancias.push_back(distancia_total);
     }
-    
+
     return solution;
 }

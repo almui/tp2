@@ -51,7 +51,6 @@ Solution insertion(const VRPLIBReader& instancia){
 
     while (unvisited.size()>0){
         int closest_node = findClosestUnvisited(instancia, unvisited);
-        cout<<closest_node<<"\n";
         double best_cost_insertando = 100000000;
         int best_ruta = -1;
         int best_position = -1;
@@ -82,8 +81,6 @@ Solution insertion(const VRPLIBReader& instancia){
         }
         removeNodeFromVector(unvisited, closest_node);
     }
-    cout<<"done\n";
-    sol.printSolution();
     return sol;
 
 }

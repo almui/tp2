@@ -104,20 +104,21 @@ void Solution::printSolution() const {
     cout << "COST : " << totalCost << endl;
     cout << "SOLUTION_SECTION" << endl;
     cout << " #R SUMD COST LENGTH #C SEQUENCE" << endl;
-    
+    double total_dist = 0;
     for (int i = 0; i < _rutas.size(); ++i) {
         cout << setw(3) << i + 1 << " "
              << setw(5) << _sumd[i] << " "
              << setw(10) << _distancias[i] << " "
              << setw(10) << _distancias[i] << " "
              << setw(4) << _rutas[i].size() << " ";
-             
+        
         for (int j = 0; j < _rutas[i].size(); ++j) {
             cout << _rutas[i][j] << " ";
         }
         cout << endl;
+        total_dist+=_distancias[i];
     }
-    
+    cout<<"TOTAL DISTANCE TRAVELED: "<<total_dist<<"\n";
     cout << "DEPOT_SECTION" << endl;
     cout << depot << endl;
     cout << "END" << endl;

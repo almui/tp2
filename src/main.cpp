@@ -3,7 +3,7 @@
 #include "ClarkeWright.h"
 #include "Solution.h"
 #include "InsertionHeuristic.h"
-
+#include "Relocate.h"
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <path_to_vrp_file>" << std::endl;
@@ -36,6 +36,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\nEjecutando Heuristica de insercion...\n" << std::endl;
     Solution sol = clarke_wright(reader);
+    Solution relocated_sol = relocate(sol);
     std::vector<vector<int>> rutas = sol.getRutas();
     // vector<vector<int>> rutas = clarke_wright(reader);
     // std::cout << "Rutas generadas:\n";
@@ -46,7 +47,11 @@ int main(int argc, char* argv[]) {
     //     }
     //     std::cout << std::endl;
     // }
+    cout<<"Naive solution:\n";
     sol.printSolution();
+    cout<<"Relocated solution:\n";
+    relocated_sol.printSolution();
+
     return 0;
 }
 
