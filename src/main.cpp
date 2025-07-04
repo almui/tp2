@@ -4,7 +4,9 @@
 #include "Solution.h"
 #include "InsertionHeuristic.h"
 #include "Relocate.h"
+#include "Swap.h"
 int main(int argc, char* argv[]) {
+    srand(time(0));
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <path_to_vrp_file>" << std::endl;
         return 1;
@@ -34,23 +36,16 @@ int main(int argc, char* argv[]) {
         std::cout << std::endl;
     }
 
-    std::cout << "\nEjecutando Heuristica de insercion...\n" << std::endl;
-    Solution sol = clarke_wright(reader);
-    Solution relocated_sol = relocate(sol);
-    std::vector<vector<int>> rutas = sol.getRutas();
-    // vector<vector<int>> rutas = clarke_wright(reader);
-    // std::cout << "Rutas generadas:\n";
-    // for (size_t i = 0; i < rutas.size(); ++i) {
-    //     std::cout << "Ruta " << i + 1 << ": ";
-    //     for (int cliente : rutas[i]) {
-    //         std::cout << cliente << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
+    std::cout << "\nEjecutando Heuristica de cw...\n" << std::endl;
+    Solution sol = meta_insertion(reader);
+
+
     cout<<"Naive solution:\n";
     sol.printSolution();
-    cout<<"Relocated solution:\n";
-    relocated_sol.printSolution();
+
+    // Solution relocated_sol = route_swap(sol);
+    // cout<<"Relocated solution:\n";
+    // relocated_sol.printSolution();
 
     return 0;
 }

@@ -19,7 +19,7 @@ Solution route_swap(const Solution& solution_original) {
 
         for (int r1 = 0; r1 < rutas.size() && !mejora_encontrada; ++r1) {
             for (int r2 = 0; r2 < rutas.size() && !mejora_encontrada; ++r2) {
-                if (r1 == r2 && i == j) continue;
+                if (r1 == r2) continue;
 
                 for (int i = 1; i < rutas[r1].size() - 1 && !mejora_encontrada; ++i) {
                     for (int j = 1; j < rutas[r2].size() - 1 && !mejora_encontrada; ++j) {
