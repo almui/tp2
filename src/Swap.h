@@ -1,19 +1,11 @@
-#ifndef SWAP 
-#define SWAP 
+#ifndef SWAP_H
+#define SWAP_H
 
-#include <string>
 #include <vector>
-#include <iostream>
+#include "VRPLIBReader.h"
 #include "Solution.h"
-#include "Utils.h"
-
 using namespace std;
 
-class Swap {
-    public:
-        Swap();
-        Solution solve(Solution Solucion);
-    private:
+Solution route_swap(const Solution & initial_sol);
 
-};
-#endif // SWAP 
+#endif 

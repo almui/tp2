@@ -1,8 +1,9 @@
 #include "Swap.h"
 #include "Utils.h"
-Swap::Swap() {}
 
-Solution Swap::solve(Solution solution) {
+Solution route_swap(const Solution& solution_original) {
+    Solution solution = solution_original;
+
     const VRPLIBReader& instancia = solution.getInstancia();
     const vector<int>& demandas = instancia.getDemands();
     int capacidad = instancia.getCapacity();
@@ -18,7 +19,7 @@ Solution Swap::solve(Solution solution) {
 
         for (int r1 = 0; r1 < rutas.size() && !mejora_encontrada; ++r1) {
             for (int r2 = 0; r2 < rutas.size() && !mejora_encontrada; ++r2) {
-                if (r1 == r2) continue;
+                if (r1 == r2 && i == j) continue;
 
                 for (int i = 1; i < rutas[r1].size() - 1 && !mejora_encontrada; ++i) {
                     for (int j = 1; j < rutas[r2].size() - 1 && !mejora_encontrada; ++j) {
@@ -35,14 +36,12 @@ Solution Swap::solve(Solution solution) {
 
                         Solution copia = solution;
 
-                        // Remove clients
                         copia.removeClient(r1, i);
                         copia.removeClient(r2, j);
 
-                        // After removing, if r1 == r2 or i < j, the indices may have shifted, so adjust
-                        if (r1 == r2 && i < j) j--;  // r2's j shifted after removing from r1 first
+                        // Adjust index if on the same route
+                        if (r1 == r2 && i < j) j--;
 
-                        // Insert clients in the same positions
                         copia.addClient(c2, r1, i);
                         copia.addClient(c1, r2, j);
 
@@ -62,8 +61,3 @@ Solution Swap::solve(Solution solution) {
 
     return solution;
 }
-
-
-
-
-
