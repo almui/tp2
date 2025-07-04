@@ -56,18 +56,26 @@ void Solution::removeClient(int ruta, int posicion) {
     
     // Update demand
     _sumd[ruta] -= _instancia.getDemands()[id];
-    
+
     // Update distance
     const auto& dist = _instancia.getDistanceMatrix();
     int anterior = r[posicion - 1];
     int siguiente = r[posicion + 1];
-    
+
     _distancias[ruta] -= dist[anterior][id] + dist[id][siguiente];
     _distancias[ruta] += dist[anterior][siguiente];
-    
+
     // Remove client from route
     r.erase(r.begin() + posicion);
+
+    // If route is now just [depot, depot], remove it entirely
+    if (r.size() == 2) {
+        _rutas.erase(_rutas.begin() + ruta);
+        _sumd.erase(_sumd.begin() + ruta);
+        _distancias.erase(_distancias.begin() + ruta);
+    }
 }
+
 
 
 bool Solution::esValida(int ruta) {

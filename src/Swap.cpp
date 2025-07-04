@@ -10,7 +10,6 @@ Solution Swap::solve(Solution solution) {
     bool hay_mejora = true;
 
     while (hay_mejora) {
-        
         hay_mejora = false;
         double mejor_costo = calcularCostoTotal(solution);
         vector<vector<int>> rutas = solution.getRutas();
@@ -36,13 +35,16 @@ Solution Swap::solve(Solution solution) {
 
                         Solution copia = solution;
 
-                        int prev1 = rutas[r1][i - 1], next1 = rutas[r1][i + 1];
-                        int prev2 = rutas[r2][j - 1], next2 = rutas[r2][j + 1];
+                        // Remove clients
+                        copia.removeClient(r1, i);
+                        copia.removeClient(r2, j);
 
-                        copia.removeClient(c1, r1, prev1, next1);
-                        copia.removeClient(c2, r2, prev2, next2);
-                        copia.addClient(c2, r1, prev1, next1);
-                        copia.addClient(c1, r2, prev2, next2);
+                        // After removing, if r1 == r2 or i < j, the indices may have shifted, so adjust
+                        if (r1 == r2 && i < j) j--;  // r2's j shifted after removing from r1 first
+
+                        // Insert clients in the same positions
+                        copia.addClient(c2, r1, i);
+                        copia.addClient(c1, r2, j);
 
                         double nuevo_costo = calcularCostoTotal(copia);
 
@@ -60,6 +62,7 @@ Solution Swap::solve(Solution solution) {
 
     return solution;
 }
+
 
 
 
