@@ -1,8 +1,9 @@
 #include "Swap.h"
 #include "Utils.h"
-Swap::Swap() {}
 
-Solution Swap::solve(Solution solution) {
+Solution route_swap(const Solution& solution_original) {
+    Solution solution = solution_original;
+
     const VRPLIBReader& instancia = solution.getInstancia();
     const vector<int>& demandas = instancia.getDemands();
     int capacidad = instancia.getCapacity();
@@ -10,7 +11,6 @@ Solution Swap::solve(Solution solution) {
     bool hay_mejora = true;
 
     while (hay_mejora) {
-        
         hay_mejora = false;
         double mejor_costo = calcularCostoTotal(solution);
         vector<vector<int>> rutas = solution.getRutas();
@@ -36,13 +36,14 @@ Solution Swap::solve(Solution solution) {
 
                         Solution copia = solution;
 
-                        int prev1 = rutas[r1][i - 1], next1 = rutas[r1][i + 1];
-                        int prev2 = rutas[r2][j - 1], next2 = rutas[r2][j + 1];
+                        copia.removeClient(r1, i);
+                        copia.removeClient(r2, j);
 
-                        copia.removeClient(c1, r1, prev1, next1);
-                        copia.removeClient(c2, r2, prev2, next2);
-                        copia.addClient(c2, r1, prev1, next1);
-                        copia.addClient(c1, r2, prev2, next2);
+                        // Adjust index if on the same route
+                        if (r1 == r2 && i < j) j--;
+
+                        copia.addClient(c2, r1, i);
+                        copia.addClient(c1, r2, j);
 
                         double nuevo_costo = calcularCostoTotal(copia);
 
@@ -60,7 +61,3 @@ Solution Swap::solve(Solution solution) {
 
     return solution;
 }
-
-
-
-
