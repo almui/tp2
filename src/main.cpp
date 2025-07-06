@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0]
-                  << " <path_to_vrp_file> <algorithm: clarke_wright|insertion|meta_insertion> [swap: true|false] [relocate: true|false]\n";
+                  << " <path_to_vrp_file> <algorithm: clarke_wright|insertion|meta_insertion> [swap: True|False] [relocate: True|False]\n";
         return 1;
     }
 
@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
     std::string algorithm = argv[2];
     std::transform(algorithm.begin(), algorithm.end(), algorithm.begin(), ::tolower); // normalize
 
-    bool use_swap = (argc >= 4 && std::string(argv[3]) == "true");
-    bool use_relocate = (argc >= 5 && std::string(argv[4]) == "true");
+    bool use_swap = (argc >= 4 && std::string(argv[3]) == "True");
+    bool use_relocate = (argc >= 5 && std::string(argv[4]) == "True");
 
     VRPLIBReader reader(path);
 
