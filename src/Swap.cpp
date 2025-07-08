@@ -35,12 +35,16 @@ Solution route_swap(const Solution& solution_original) {
                         if (nueva_d1 > capacidad || nueva_d2 > capacidad) continue;
 
                         Solution copia = solution;
-
+                                                int ruta1=rutas[r1].size();
+                        int ruta2=rutas[r2].size();
+                        
+                        if( ruta1 == 3 || ruta2 == 3 ) continue; //osea la ruta antes del remove solo tenia un cliente, entonces cuando se saco al cliente se elimino esa ruta
+                        // Adjust index if on the same route
+                        if (r1 == r2 && i < j) j--;
                         copia.removeClient(r1, i);
                         copia.removeClient(r2, j);
 
-                        // Adjust index if on the same route
-                        if (r1 == r2 && i < j) j--;
+
 
                         copia.addClient(c2, r1, i);
                         copia.addClient(c1, r2, j);

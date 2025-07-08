@@ -83,6 +83,27 @@ for algoritmo, grupo in df.groupby("Algoritmo"):
     
     plt.close()  # Cierra la figura actual para no superponer
 
+plt.figure(figsize=(12, 7))
+i=0
+for algoritmo, grupo in df.groupby("Algoritmo"):
+    grupo = grupo.sort_values("NumItems")
+
+    plt.plot(grupo["NumItems"], grupo["Tiempo"], marker='o', linestyle='--', label=algoritmo, color=colores[i])
+    i=i+1
+    
+plt.xlabel("Número de ítems")
+plt.ylabel("Tiempo de ejecución (s)")
+plt.title(f"Tiempos por instancia")
+plt.legend()
+plt.grid(True, which="both", ls="--", linewidth=0.5)
+plt.tight_layout()
+
+output_path = os.path.join(directory, f"time_7_algoritmos.png") 
+plt.savefig(output_path)
+print(f"Chart saved as {output_path}")
+
+plt.close()  # Cierra la figura actual para no superponer
+
 
 
 

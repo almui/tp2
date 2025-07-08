@@ -54,7 +54,7 @@ def run_benchmark():
 
             instance_path = os.path.join(INSTANCE_DIR, fname)
             max_vehicles = get_max_vehicles(instance_path)
-            cmd = [BINARY_PATH, instance_path, algo, "false", "false"]
+            cmd = [BINARY_PATH, instance_path, algo, "False", "False"]
 
             print(f"Running {algo} on {fname}...")
 
