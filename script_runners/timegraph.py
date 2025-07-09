@@ -60,7 +60,7 @@ for algoritmo, tiempos in results.items():
 
 df = pd.DataFrame(df_list)
 
-# Graficar cada algoritmo por separado 
+# Grafico de cada algoritmo por separado 
 plt.figure(figsize=(12, 7))
 colores = ["#1f77b4",  "#ff7f0e","#2ca02c", "#d62728","#9467bd",  "#8c564b","#17becf"]
 i=0
@@ -83,6 +83,7 @@ for algoritmo, grupo in df.groupby("Algoritmo"):
     
     plt.close()  # Cierra la figura actual para no superponer
 
+# Grafica de todos los algoritmo 
 plt.figure(figsize=(12, 7))
 i=0
 for algoritmo, grupo in df.groupby("Algoritmo"):

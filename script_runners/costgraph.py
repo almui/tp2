@@ -76,16 +76,54 @@ x5, y5 = zip(*sorted(in_1.items()))
 x6, y6 = zip(*sorted(in_2.items()))
 x7, y7 = zip(*sorted(in_3.items()))
 
-# Graficar
+# Grafico de costos con Insertion
 plt.figure(figsize=(12, 7))
 
+
+plt.plot(x5, y5, label='insertion', color=colores[4], marker='D', linestyle='--')
+plt.plot(x6, y6, label='insertion+relocate', color=colores[5], marker='P', linestyle='--')
+plt.plot(x7, y7, label='insertion+swap', color=colores[6], marker='*', linestyle='--')
+
+plt.xlabel("Número de ítems")
+plt.ylabel("Costo")
+plt.title("Costos por instancia - Insertion + operadores locales")
+plt.legend()
+plt.grid(True, which="both", ls="--", linewidth=0.5)
+plt.tight_layout()
+
+output_path = os.path.join(directory, "costos_insertion_.png")
+plt.savefig(output_path)
+plt.show()
+# Grafico de costos con Clarke & Wright
+plt.figure(figsize=(12, 7))
 plt.plot(x1, y1, label='cw', color=colores[0], marker='o', linestyle='--')
 plt.plot(x2, y2, label='cw+relocate', color=colores[1], marker='s', linestyle='--')
 plt.plot(x3, y3, label='cw+relocate+swap', color=colores[2], marker='^', linestyle='--')
 plt.plot(x4, y4, label='cw+swap', color=colores[3], marker='x', linestyle='--')
+
+
+plt.xlabel("Número de ítems")
+plt.ylabel("Costo")
+plt.title("Costos por instancia - Clarke & Wright + operadores locales")
+plt.legend()
+plt.grid(True, which="both", ls="--", linewidth=0.5)
+plt.tight_layout()
+
+output_path = os.path.join(directory, "costos_cw_.png")
+plt.savefig(output_path)
+plt.show()
+# Grafico de de todos los costos 
+i=0
+plt.figure(figsize=(12, 7))
+
+
 plt.plot(x5, y5, label='insertion', color=colores[4], marker='D', linestyle='--')
 plt.plot(x6, y6, label='insertion+relocate', color=colores[5], marker='P', linestyle='--')
 plt.plot(x7, y7, label='insertion+swap', color=colores[6], marker='*', linestyle='--')
+plt.plot(x1, y1, label='cw', color=colores[0], marker='o', linestyle='--')
+plt.plot(x2, y2, label='cw+relocate', color=colores[1], marker='s', linestyle='--')
+plt.plot(x3, y3, label='cw+relocate+swap', color=colores[2], marker='^', linestyle='--')
+plt.plot(x4, y4, label='cw+swap', color=colores[3], marker='x', linestyle='--')
 
 plt.xlabel("Número de ítems")
 plt.ylabel("Costo")
@@ -94,11 +132,9 @@ plt.legend()
 plt.grid(True, which="both", ls="--", linewidth=0.5)
 plt.tight_layout()
 
-output_path = os.path.join(directory, "costos_7_algoritmos.png")
+output_path = os.path.join(directory, "costos_algoritmos_.png")
 plt.savefig(output_path)
 plt.show()
-
-i=0
 # Graficar cada uno por separado 
 df = pd.DataFrame([
     {"Algoritmo": algoritmo, "NumItems": num_items, "Costo": costo}
@@ -109,7 +145,7 @@ plt.figure(figsize=(12, 7))
 for algoritmo, grupo in df.groupby("Algoritmo"):
     grupo = grupo.sort_values("NumItems")
     
-    plt.figure(figsize=(10, 6))  # Crea una nueva figura
+    plt.figure(figsize=(10, 6))  
     plt.plot(grupo["NumItems"], grupo["Costo"], marker='o', linestyle='--', label=algoritmo, color=colores[i])
     i+=1
     plt.xlabel("Número de ítems")
